@@ -59,6 +59,26 @@
         Если файла settings.xml нет, создайте и вставьте в него:
         
         settings.xml
+
+            <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+            https://maven.apache.org/xsd/settings-1.0.0.xsd">
+                <servers>
+                    <server>
+                        <id>skillbox-gitlab</id>
+                         <configuration>
+                            <httpHeaders>
+                                <property>
+                                    <name>Private-Token</name>
+                                    <value>glpat-Viu1C6oUSddYB3JdKviW</value>
+                                </property>
+                            </httpHeaders>
+                        </configuration>
+                    </server>
+                </servers>
+            </settings>
+        
         Если файл уже есть, то добавьте только блок server в servers
     4. Веб-интерфейс запущенного приложения будет доступен на http://localhost:8080/
 
