@@ -7,7 +7,7 @@ import searchengine.config.SitesList;
 import searchengine.dto.IndexPageRequest;
 import searchengine.dto.response.DefaultResponse;
 import searchengine.dto.response.ErrorResponse;
-import searchengine.repository.SearchEngineRepository;
+import searchengine.repository.SiteRepo;
 import searchengine.utils.SiteIndexBuilder;
 
 import java.util.List;
@@ -18,16 +18,16 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class IndexingServiceImpl implements IndexingService{
 
-    private static final int THREADS = 4;
-    private static ExecutorService executor;
+    private static final int THREADS = 1000;
+    private ExecutorService executor;
     private final SitesList sitesList;
 
     @Override
     public DefaultResponse startIndexing() {
-        if (SiteIndexBuilder.IsStarted()){
+        if (SiteIndexBuilder.isStarted()){
             return ErrorResponse.getErrorMessage("Индексация уже запущена");
         }
-        SearchEngineRepository.siteRepository.deleteAll();
+        SiteRepo.siteRepository.deleteAll();
         executor = Executors.newFixedThreadPool(THREADS);
         SiteIndexBuilder.start();
         List<Site> siteListCfg = sitesList.getSites();
@@ -39,7 +39,7 @@ public class IndexingServiceImpl implements IndexingService{
 
     @Override
     public DefaultResponse stopIndexing() {
-        if (!SiteIndexBuilder.IsStarted()){
+        if (!SiteIndexBuilder.isStarted()){
             return ErrorResponse.getErrorMessage("Индексация не запущена");
         }
         SiteIndexBuilder.stop();
@@ -72,7 +72,6 @@ public class IndexingServiceImpl implements IndexingService{
         }
         SiteIndexBuilder.start();
         SiteIndexBuilder siteIndexBuilder = new SiteIndexBuilder(site.getUrl(), site.getName());
-        DefaultResponse result = siteIndexBuilder.indexPage(url);
-        return result;
+        return siteIndexBuilder.indexPage(url);
     }
 }

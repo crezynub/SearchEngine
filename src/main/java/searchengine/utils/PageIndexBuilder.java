@@ -3,7 +3,7 @@ package searchengine.utils;
 import lombok.Setter;
 import org.jsoup.HttpStatusException;
 import searchengine.model.Page;
-import searchengine.repository.SearchEngineRepository;
+import searchengine.repository.PageRepo;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class PageIndexBuilder extends RecursiveAction {
 
     @Override
     protected void compute() {
-        if (!SiteIndexBuilder.IsStarted()) {
+        if (!SiteIndexBuilder.isStarted()) {
             return;
         };
         try {
@@ -51,10 +51,7 @@ public class PageIndexBuilder extends RecursiveAction {
             page = createPage(e.getStatusCode());
             return;
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        catch (InterruptedException e) {
+        catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
         page = createPage(pageNode.getTitle(), pageNode.getContent(), pageNode.getEscapeHtmlContent());
@@ -71,12 +68,12 @@ public class PageIndexBuilder extends RecursiveAction {
     }
 
     public void deletePageByUrl(){
-        Optional pageOptional = SearchEngineRepository.pageRepository.findBySiteAndPath(siteGraph.getSite(), url);
+        Optional<Page> pageOptional = PageRepo.pageRepository.findBySiteAndPath(siteGraph.getSite(), url);
         if (pageOptional.isEmpty()){
             return;
         }
         page = (Page) pageOptional.get();
-        SearchEngineRepository.pageRepository.delete(page);
+        PageRepo.pageRepository.delete(page);
     }
 
     private List<PageIndexBuilder> createSubTask(HashSet<String> childrenPage){
@@ -96,7 +93,7 @@ public class PageIndexBuilder extends RecursiveAction {
         page.setContent(content);
         page.setTitle(title);
         page.setHtmlContent(htmlContent);
-        SearchEngineRepository.pageRepository.saveAndFlush(page);
+        PageRepo.pageRepository.saveAndFlush(page);
         return page;
     }
 
@@ -106,7 +103,7 @@ public class PageIndexBuilder extends RecursiveAction {
         page.setPath(url);
         page.setCode(statusCode);
         page.setContent("");
-        SearchEngineRepository.pageRepository.saveAndFlush(page);
+        PageRepo.pageRepository.saveAndFlush(page);
         return page;
     }
 

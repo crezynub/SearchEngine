@@ -5,7 +5,9 @@ import searchengine.dto.search.SearchResulItem;
 import searchengine.model.Lemma;
 import searchengine.model.Page;
 import searchengine.model.Site;
-import searchengine.repository.SearchEngineRepository;
+import searchengine.repository.LemmaRepo;
+import searchengine.repository.PageRepo;
+import searchengine.repository.SiteRepo;
 
 import java.io.IOException;
 import java.util.*;
@@ -13,7 +15,6 @@ import java.util.stream.Collectors;
 
 public class SearchResultBuilder {
     private final int PAGE_PERCENTAGE_LIMIT = 50;
-
 
     public SearchResponse getSearchResult(String siteUrl, String query) throws IOException {
         Site site = getSite(siteUrl);
@@ -86,7 +87,7 @@ public class SearchResultBuilder {
     }
 
     private Site getSite(String siteUrl){
-        Optional<Site> siteOptional = SearchEngineRepository.siteRepository.findByUrl(siteUrl);
+        Optional<Site> siteOptional = SiteRepo.siteRepository.findByUrl(siteUrl);
         if (siteOptional.isEmpty()){
             return null;
         }
@@ -99,16 +100,16 @@ public class SearchResultBuilder {
 
     private long getCountPages(Site site) {
         if (site == null){
-            return SearchEngineRepository.pageRepository.count();
+            return PageRepo.pageRepository.count();
         }else {
-            return SearchEngineRepository.pageRepository.countBySite(site);
+            return PageRepo.pageRepository.countBySite(site);
         }
     }
 
     private List<Lemma> getLemmaList(Site site, String query) throws IOException {
         Set<String> words = getWordsFromText(query);
         if (site == null){
-            List<Lemma> lemmaList = SearchEngineRepository.lemmaRepository.findAll().stream()
+            List<Lemma> lemmaList = LemmaRepo.lemmaRepository.findAll().stream()
                     .filter(lemma -> words.contains(lemma.getLemma()))
                     .collect(Collectors.toList());
             return lemmaList;
@@ -117,22 +118,6 @@ public class SearchResultBuilder {
                     .filter(lemma -> words.contains(lemma.getLemma()))
                     .collect(Collectors.toList());
             return lemmaList;
-        }
-    }
-
-
-    private static class LemmaComparator implements Comparator<Lemma>{
-
-        @Override
-        public int compare(Lemma l1, Lemma l2) {
-            if (l1.getFrequency() < l2.getFrequency())
-            {
-                return -1;
-            }
-            if (l1.getFrequency()> l2.getFrequency()){
-                return 1;
-            }
-            return 0;
         }
     }
 }

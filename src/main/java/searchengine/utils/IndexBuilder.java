@@ -4,7 +4,7 @@ import lombok.Setter;
 import searchengine.model.Index;
 import searchengine.model.Lemma;
 import searchengine.model.Page;
-import searchengine.repository.SearchEngineRepository;
+import searchengine.repository.IndexRepo;
 
 import java.util.Optional;
 @Setter
@@ -22,17 +22,17 @@ public class IndexBuilder {
     }
 
     private void createIfNotAvailable(int rank){
-        Optional indexOptional = SearchEngineRepository.indexRepository.findByPageAndLemma(page, lemma);
+        Optional indexOptional = IndexRepo.indexRepository.findByPageAndLemma(page, lemma);
         if (!indexOptional.isEmpty()){
             Index index = (Index) indexOptional.get();
             index.setRank((float) rank);
-            SearchEngineRepository.indexRepository.save(index);
+            IndexRepo.indexRepository.save(index);
 
         }
         Index index = new Index();
         index.setPage(page);
         index.setLemma(lemma);
         index.setRank((float) rank);
-        SearchEngineRepository.indexRepository.save(index);
+        IndexRepo.indexRepository.save(index);
     }
 }

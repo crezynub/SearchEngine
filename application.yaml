@@ -10,6 +10,8 @@ indexing-settings:
       name: PlayBack.Ru
     - url: https://dombulgakova.ru
       name: DomBulgakova
+    - url: https://dzen.ru
+      name: Дзен
 
 server:
   port: 8080

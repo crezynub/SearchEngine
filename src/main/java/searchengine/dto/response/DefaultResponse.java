@@ -1,8 +1,10 @@
 package searchengine.dto.response;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class DefaultResponse {
     private boolean result;
 

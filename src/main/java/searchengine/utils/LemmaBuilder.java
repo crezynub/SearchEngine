@@ -4,7 +4,7 @@ import lombok.Setter;
 import searchengine.model.Lemma;
 import searchengine.model.Page;
 import searchengine.model.Site;
-import searchengine.repository.SearchEngineRepository;
+import searchengine.repository.LemmaRepo;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class LemmaBuilder {
     private void build() throws IOException {
         lemmas = Lemmatizator.init().getLemmasNumberOfReferences(page.getContent());
         for (Map.Entry<String, Integer> entry: lemmas.entrySet()){
-            if (!SiteIndexBuilder.IsStarted()) return;
+            if (!SiteIndexBuilder.isStarted()) return;
             synchronized (LemmaBuilder.class){
                 Lemma lemma = createIfNotAvailable(entry.getKey());
                 IndexBuilder.buildIndex(page, lemma, entry.getValue());
@@ -35,18 +35,18 @@ public class LemmaBuilder {
     }
 
     private Lemma createIfNotAvailable(String normalForm) {
-        Optional lemmaOptional = SearchEngineRepository.lemmaRepository.findBySiteAndLemma(site, normalForm);
+        Optional lemmaOptional = LemmaRepo.lemmaRepository.findBySiteAndLemma(site, normalForm);
         if (!lemmaOptional.isEmpty()){
             Lemma lemma = (Lemma) lemmaOptional.get();
             lemma.setFrequency(lemma.getFrequency()+1);
-            SearchEngineRepository.lemmaRepository.save(lemma);
+            LemmaRepo.lemmaRepository.save(lemma);
             return lemma;
         }
         Lemma lemma = new Lemma();
         lemma.setSite(site);
         lemma.setLemma(normalForm);
         lemma.setFrequency(1);
-        SearchEngineRepository.lemmaRepository.save(lemma);
+        LemmaRepo.lemmaRepository.save(lemma);
         return lemma;
     }
 }

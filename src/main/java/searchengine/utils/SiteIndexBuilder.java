@@ -4,7 +4,7 @@ import searchengine.dto.response.DefaultResponse;
 import searchengine.dto.response.ErrorResponse;
 import searchengine.model.IndexStatus;
 import searchengine.model.Site;
-import searchengine.repository.SearchEngineRepository;
+import searchengine.repository.SiteRepo;
 
 import java.util.Date;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class SiteIndexBuilder implements Runnable{
             if (forkJoinPool.isTerminated()){
                 site.setStatus(IndexStatus.INDEXED);
                 site.setStatusTime(new Date());
-                SearchEngineRepository.siteRepository.saveAndFlush(site);
+                SiteRepo.siteRepository.saveAndFlush(site);
                 checkService.shutdownNow();
             }
         },1, 10, TimeUnit.SECONDS);
@@ -46,7 +46,7 @@ public class SiteIndexBuilder implements Runnable{
 
     public DefaultResponse indexPage(String pageUrl){
 
-        Optional siteOptional = SearchEngineRepository.siteRepository.findByUrl(url);
+        Optional siteOptional = SiteRepo.siteRepository.findByUrl(url);
         if (siteOptional.isEmpty()){
             return ErrorResponse.getErrorMessage("Сайт ранее не индексировался.");
         }
@@ -69,7 +69,7 @@ public class SiteIndexBuilder implements Runnable{
         SiteIndexBuilder.started = false;
     }
 
-    public static boolean IsStarted(){
+    public static boolean isStarted(){
         return started;
     }
 
@@ -80,7 +80,7 @@ public class SiteIndexBuilder implements Runnable{
         site.setLastError("");
         site.setUrl(url);
         site.setName(siteName);
-        SearchEngineRepository.siteRepository.saveAndFlush(site);
+        SiteRepo.siteRepository.saveAndFlush(site);
         return site;
     }
 }

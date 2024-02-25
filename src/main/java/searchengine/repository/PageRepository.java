@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface PageRepository extends JpaRepository<Page, Integer> {
     Optional<Page> findBySiteAndPath(Site site, String path);
 
-    long countBySite_Name(String name);
+    long countBySiteName(String name);
 
     @Query("select count(p) from Page p where p.site = ?1")
     long countBySite(Site site);
